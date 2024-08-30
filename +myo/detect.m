@@ -27,7 +27,7 @@ for iBatch = 1:nBatches
     Y = smooth1D(mean(Y,1),opt.Fs,'gau','dim',2,'sd',5e-4);
     
     % find pulses
-    [~,spkIdx{iBatch}] = findpeaks(Y,'MinPeakHeight',1);
+    [~,spkIdx{iBatch}] = findpeaks(Y,'MinPeakHeight', .6);
     
     spkIdx{iBatch} = spkIdx{iBatch} + batchLim(iBatch)-1;
 end

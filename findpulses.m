@@ -154,7 +154,7 @@ for ii = 1:prod(szXP(2:end))
     
     % filter pulse train by half-minimum pulse width
     if P.Results.minWid > 0
-        u = smooth1D(s,Fs,'gau',true,'sd',P.Results.minWid/2);
+        u = smooth1D(s,Fs,'gau','sd',P.Results.minWid/2);
     else
         u = s;
     end

@@ -96,7 +96,10 @@ if iscell(Y)
     nGrp = length(Y);
     
     % normalize
-    absMax = cellfun(@(x) max(max(abs(x),[],2),[],1), Y);
+    absMax = cellfun(@(x) ...
+    (isempty(x) || all(size(x) == 0)) * NaN + ...
+    ~(isempty(x) || all(size(x) == 0)) * max(max(abs(x), [], 2), [], 1), ...
+    Y, 'UniformOutput', true);
     Y = cellfun(@(x,m) x/m, Y, num2cell(absMax), 'uni',false);
     
     % apply vertical offset to each group

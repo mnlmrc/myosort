@@ -169,17 +169,25 @@ if P.Results.refDur > 0
         % convert spike indices to pulse trains
         s = zeros(1,nDataPoints);
         s(spkIdx{un}) = 1;
+
+        pad_size = 100 * P.Results.refDur * P.Results.Fs;
+        pad = zeros(1, pad_size);
+        s = [pad, s, pad]; % added by me because otherwise activity dont go to zero
     
         % detect putative refractory period violations
         y = double(smooth1D(s,Fs,'box','wid',P.Results.refDur/2,'dim',2));
         y = y.*(y>0.5);
+        % y = [y, 0];  %% added by me
         
+        % y = y(pad_size-1:end-pad_size);
+
+        % dy = diff(y);
         dy = [NaN,diff(y)];
-        yOn = find(dy(2:end)>0.5 & dy(1:end-1)==0 & y(1:end-1)<0.5);
-        yOff = find(dy(1:end-1)<-0.5 & dy(2:end)==0 & y(2:end)<0.5);
+        yOn = find(dy(2:end)>0.5 & dy(1:end-1)==0 & y(1:end-1)<0.5); %- pad_size;
+        yOff = find(dy(1:end-1)<-0.5 & dy(2:end)==0 & y(2:end)<0.5); %- pad_size;
         yLim = mat2cell([yOn(:),yOff(:)],ones(length(yOn),1),2);
         
-        refLim = cell2mat(yLim);
+        refLim = cell2mat(yLim) - pad_size; % pad_size removed here!!!
         
         rmvSpk = false(size(spkIdx{un}));
         
@@ -230,6 +238,8 @@ if P.Results.sic && nnz(~cellfun(@isempty,spkIdx)) > 1
         s(un,spkIdx{un}) = 1;
         sFilt(un,:) = double(smooth1D(s(un,:),Fs,'box','wid',waveLen/Fs,'dim',2) > 0.5);
     end
+
+    sFilt = [ zeros(nUnit, pad_size) ,sFilt, zeros(nUnit, pad_size)];
     
     % create spike IDs (index and unit number)
     spkIdx = cellfun(@(x) x(:)',spkIdx,'uni',false);
@@ -242,8 +252,8 @@ if P.Results.sic && nnz(~cellfun(@isempty,spkIdx)) > 1
     dy = [NaN,diff(y)];
     yOn = find(dy(2:end)>0.5 & dy(1:end-1)==0 & y(1:end-1)<0.5);
     yOff = find(dy(1:end-1)<-0.5 & dy(2:end)==0 & y(2:end)<0.5);
-    yLim = mat2cell([yOn(:),yOff(:)],ones(length(yOn),1),2);
-    overlapBins = cellfun(@(l) max(y(l(1):l(2)))>1.5, yLim);
+    yLim = mat2cell([yOn(:),yOff(:)]  - pad_size + 1,ones(length(yOn),1),2); % pad_size removed here!!!
+    overlapBins = cellfun(@(l) ~isempty(l) && l(1) <= l(2) && max(y(l(1):l(2))) > 1.5, yLim, 'UniformOutput', true);
     overlapLim = cell2mat(yLim(overlapBins));
     
     if ~isempty(overlapLim)

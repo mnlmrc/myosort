@@ -111,7 +111,7 @@ isscalarnum = @(x,lb,ub) isscalar(x) && isnumeric(x) && x>lb && x<ub;
 addRequired(P, 'X', @isnumeric)
 addRequired(P, 'Fs', @(x) isscalarnum(x,0,Inf))
 addRequired(P, 'method', @(s) ischar(s) && ismember(s,{'beta','box','gau'}))
-addOptional(P, 'norm', false, @islogical)
+addParameter(P, 'norm', false, @islogical)
 addParameter(P, 'dim', 1, @(x) isscalarnum(x,0,ndims(X)+1) && x==round(x))
 addParameter(P, 'betaAlpha', 3, @(x) isscalarnum(x,0,Inf))
 addParameter(P, 'betaBeta', 5, @(x) isscalarnum(x,0,Inf))
@@ -119,7 +119,8 @@ addParameter(P, 'betaDur', 0.275, @(x) isscalarnum(x,0-eps,1+eps))
 addParameter(P, 'boxDur', 0.1, @(x) isscalarnum(x,0,Inf))
 addParameter(P, 'gauSd', 0.025, @(x) isscalarnum(x,0,Inf))
 addParameter(P, 'gauWid', 4, @(x) isscalarnum(x,0,Inf))
-
+addParameter(P, 'sd', [], @(x) isscalarnum(x,0,Inf));
+addParameter(P, 'wid', [], @(x) isscalarnum(x,0,Inf));
 
 % clear workspace (parser object retains the data while staying small)
 parse(P, X, Fs, method, varargin{:});
