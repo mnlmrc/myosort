@@ -63,6 +63,7 @@ addParameter(P, 'alignBatchSize', 100, @isscalar)
 addParameter(P, 'clusterFeatures', 3, @isnumeric)
 % triage
 addParameter(P, 'triageCutProportion', 0.2, @isnumeric)
+addParameter(P, 'MinPeakHeight', 0.5, @isnumeric) %% added by me
 addParameter(P, 'triageBins', 100, @isscalar)
 addParameter(P, 'triageMinCount', 5, @isnumeric)
 % merge
